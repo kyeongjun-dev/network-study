@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: app-a
+
+server:
+  port: 8080
+
+# ⬇️⬇️ App B 접속 정보 및 기본 타임아웃 설정을 추가합니다. ⬇️⬇️
+appb:
+  client:
+    base-url: "http://app-b"  # Docker Compose의 서비스 이름
+    port: 8081
+    default-timeout:
+      connect: 5000 # 기본 Connection Timeout (ms)
+      read: 5000    # 기본 Read/Socket Timeout (ms)

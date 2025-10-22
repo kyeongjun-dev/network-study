@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  # App A (Client)
+  app-a:
+    build: ./app-a
+    ports:
+      - "8080:8080"
+    depends_on:
+      - app-b
+
+  # App B (Server)
+  app-b:
+    build: ./app-b
+    ports:
+      - "8081:8081"
