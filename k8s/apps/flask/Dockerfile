@@ -6,6 +6,8 @@ ENV PYTHONUNBUFFERED=TRUE
 WORKDIR /app
 
 # 3. 의존성 설치
+RUN apt update -y && apt install -y procps net-tools vim tcpdump iproute2
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

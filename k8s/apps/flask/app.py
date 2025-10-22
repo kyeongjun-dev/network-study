@@ -8,7 +8,7 @@ wait_time = int(os.environ.get('WAIT_TIME', '10'))
 
 @app.route('/')
 def hello():
-    return "Hello from Flask App behind NGINX!"
+    return "Hello from Flask App!"
 
 # 로드밸런서 유휴 시간 초과 재현을 위한 엔드포인트
 @app.route('/slow-response')

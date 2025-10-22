@@ -1,0 +1,9 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: my-flask
+spec:
+  serviceRef:
+    name: my-flask
+    port: 8000
+  targetGroupARN: arn:aws:elasticloadbalancing:ap-northeast-2:
