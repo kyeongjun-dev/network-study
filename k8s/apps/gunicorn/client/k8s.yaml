@@ -1,0 +1,40 @@
+# --- App A (Client) ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-python-app-a
+spec:
+  type: NodePort # 외부에서 테스트를 트리거하기 위해 NodePort 사용
+  selector:
+    app: my-python-app-a
+  ports:
+    - protocol: TCP
+      port: 8001       # Service 포트
+      targetPort: 8001   # Pod 포트
+      nodePort: 30801  # ⚠️ 외부 접근 포트
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-python-app-a-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-python-app-a
+  template:
+    metadata:
+      labels:
+        app: my-python-app-a
+    spec:
+      containers:
+      - name: my-python-container-a
+        imagePullPolicy: Never
+        image: python-app-a:test # ⚠️ App A 이미지 이름 (직접 빌드한 것으로 수정)
+        ports:
+        - containerPort: 8001
+        env:
+        - name: TARGET_HOST
+          value: "http://my-python-app:8000" # App B 서비스 DNS
+        - name: IDLE_TIME
+          value: "15" # ⚠️ App B의 KEEP_ALIVE(10초)보다 길게 설정

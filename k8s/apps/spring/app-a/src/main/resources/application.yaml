@@ -13,3 +13,14 @@ appb:
     default-timeout:
       connect: 5000 # 기본 Connection Timeout (ms)
       read: 5000    # 기본 Read/Socket Timeout (ms)
+    # ⬇️⬇️ [신규] Keep-Alive 및 유휴 커넥션 검사 설정
+    keep-alive:
+      # NLB 테스트를 위해 이 값을 변경하며 테스트합니다. (단위: ms)
+      # - 실패 재현 (Connection Reset): 400000 (NLB 350초보다 길게)
+      # - 성공 (방지): 5000 (짧게)
+      validate-after-inactivity: 400000 # 💣 기본값을 '실패' 시나리오로 설정
+
+# ⬇️ AWS NLB의 기본 유휴 타임아웃 (참고용)
+aws:
+  nlb:
+    idle-timeout-seconds: 350

@@ -1,0 +1,47 @@
+# --- App B (Server) ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-python-app # App A가 호출할 DNS 이름
+spec:
+  selector:
+    app: my-python-app-b # App B의 Deployment와 연결
+  ports:
+    - protocol: TCP
+      port: 8000       # Service 포트
+      targetPort: 8000   # Pod 포트
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-python-app-b-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-python-app-b
+  template:
+    metadata:
+      labels:
+        app: my-python-app-b
+    spec:
+      containers:
+      - name: my-python-container-b
+        imagePullPolicy: Never
+        image: python-app-b:test # ⚠️ App B 이미지 이름 (직접 빌드한 것으로 수정)
+        command: ["gunicorn"]
+        args: [
+          "-w", "4", 
+          "-k", "gevent", 
+          "--bind", "0.0.0.0:8000", 
+          "--log-level", "debug", 
+          "--access-logfile", "-",
+          "--timeout", "60",         # 요청 처리 타임아웃 (Keep-Alive와 다름)
+          "--keep-alive", "10",      # ⚠️ 핵심: 유휴 연결 10초 후 종료
+          "app:app"
+        ]
+        ports:
+        - containerPort: 8000
+        env:
+        - name: WAIT_TIME
+          value: "20" # /slow-response용 (이 테스트와는 무관)

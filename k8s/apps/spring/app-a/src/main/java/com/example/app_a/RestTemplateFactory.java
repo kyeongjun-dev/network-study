@@ -3,6 +3,8 @@ package com.example.app_a;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager; // ⬅️ import
+import org.springframework.beans.factory.annotation.Autowired; // ⬅️ import
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -12,25 +14,30 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RestTemplateFactory {
 
+    // ⬇️ [수정] Bean으로 등록된 공유 커넥션 풀을 주입받습니다.
+    private final PoolingHttpClientConnectionManager sharedConnectionManager;
+
+    @Autowired
+    public RestTemplateFactory(PoolingHttpClientConnectionManager sharedConnectionManager) {
+        this.sharedConnectionManager = sharedConnectionManager;
+    }
+
     /**
-     * 동적 타임아웃이 적용된 RestTemplate을 생성합니다.
-     *
-     * @param connectTimeoutMs Connection Timeout (ms)
-     * @param readTimeoutMs    Read/Socket Timeout (ms)
-     * @return 타임아웃이 적용된 RestTemplate 인스턴스
+     * [수정] validateAfterInactivity 파라미터 제거
+     * (공유 풀의 설정을 따르므로 동적 지정이 불가능)
      */
     public RestTemplate create(int connectTimeoutMs, int readTimeoutMs) {
-        
+
+        // 1. 요청별 타임아웃 설정 (기존과 동일)
         RequestConfig config = RequestConfig.custom()
-                // 1. Connection Timeout: 원격 호스트와 연결을 맺는 데 걸리는 최대 시간
                 .setConnectTimeout(connectTimeoutMs, TimeUnit.MILLISECONDS)
-                
-                // 2. Read/Socket Timeout: 연결 후 데이터를 읽어오는 데 걸리는 최대 시간
-                // (HttpClient 5에서는 .setResponseTimeout 사용)
                 .setResponseTimeout(readTimeoutMs, TimeUnit.MILLISECONDS)
                 .build();
 
+        // 2. HttpClient 생성
         CloseableHttpClient httpClient = HttpClientBuilder.create()
+                // ⬇️ [수정] 'new' 대신 주입받은 'sharedConnectionManager' 사용
+                .setConnectionManager(sharedConnectionManager) 
                 .setDefaultRequestConfig(config)
                 .build();
 

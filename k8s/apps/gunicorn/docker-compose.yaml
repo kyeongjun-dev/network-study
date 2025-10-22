@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------
+  #  App B (Server)
+  #  - Gunicorn keep-alive: 5초
+  # ----------------------------------------
+  server:
+    build: ./server
+    command: [
+      "gunicorn",
+      "-w", "4",
+      "-k", "gevent",
+      "--bind", "0.0.0.0:8000",
+      "--log-level", "debug",
+      "--access-logfile", "-",
+      "--timeout", "60",         # 요청 처리 시간
+      "--keep-alive", "5",        # ⚠️ 핵심: 유휴 연결 5초 후 종료
+      "app:app"
+    ]
+    # environment:
+    #   - WAIT_TIME=20 # /slow-response용 (이번 테스트와 무관)
+    
+  # ----------------------------------------
+  #  App A (Client)
+  #  - Idle Time: 8초
+  # ----------------------------------------
+  client:
+    build: ./client
+    ports:
+      - "8001:8001" # ⬅️ 테스트를 위해 호스트에 포트 노출
+    environment:
+      # ⚠️ 핵심: Docker Compose의 내부 DNS 'server'를 타겟으로 지정
+      - TARGET_HOST=http://server:8000 
+      # ⚠️ 핵심: 서버의 keep-alive(5초)보다 길게 대기
+      - IDLE_TIME=8
+    depends_on:
+      - server # server가 먼저 시작하도록 보장
