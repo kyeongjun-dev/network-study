@@ -1,6 +1,0 @@
-spring:
-  application:
-    name: app-b
-
-server:
-  port: 8081

@@ -2,10 +2,10 @@ import socket
 import time
 
 # --- 설정 ---
-HOST = 'my-nlb-host.com' # 1. NLB의 DNS 주소
-PORT = 8000                                  # 2. NLB 리스너 포트
-YOUR_HOST_HEADER = 'my-nlb-host.com'         # 3. (Gunicorn/Nginx가 인지하는) Host 헤더
-NLB_TIMEOUT = 300                            # 4. NLB 고정 타임아웃 (350초)
+HOST = 'nlb-address' # 1. NLB의 DNS 주소
+PORT = 8000                            # 2. NLB 리스너 포트
+YOUR_HOST_HEADER = 'nlb-address'         # 3. (Gunicorn/Nginx가 인지하는) Host 헤더
+NLB_TIMEOUT = 350                            # 4. NLB 고정 타임아웃 (350초)
 WAIT_TIME = NLB_TIMEOUT + 10                 # 5. NLB 타임아웃보다 길게 대기 (예: 360초)
 # -----------
 

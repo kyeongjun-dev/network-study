@@ -16,9 +16,6 @@ def slow_response():
     print(f"Request received. Waiting for {wait_time} seconds...")
     # 이 시간은 테스트하려는 로드밸런서의 유휴 시간보다 길어야 합니다.
     time.sleep(wait_time)
-    start_time = time.time()
-    while time.time() - start_time < wait_time:
-        pass
     print(f"Waited {wait_time} seconds. Sending response now.")
     return "Finally, here is your slow response!"
 

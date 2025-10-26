@@ -25,10 +25,12 @@ spec:
       labels:
         app: my-flask
     spec:
+      nodeSelector:
+        role: worker
       containers:
       - name: flask
-        image: flask-test
-        command: ["gunicorn", "-w", "4", "-k", "gevent", "--bind", "0.0.0.0:8000", "--timeout", "120", "--keep-alive", "400", "--log-level", "debug", "--access-logfile", "-", "app:app"]
+        image: flask-test-only-time-sleep
+        command: ["gunicorn", "-w", "4", "-k", "gevent", "--bind", "0.0.0.0:8000", "--timeout", "30", "--keep-alive", "400", "--log-level", "debug", "--access-logfile", "-", "app:app"]
         ports:
         - containerPort: 8000
         env:

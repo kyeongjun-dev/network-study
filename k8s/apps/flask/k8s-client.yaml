@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-flask-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-flask-client
+  template:
+    metadata:
+      labels:
+        app: my-flask-client
+    spec:
+      nodeSelector:
+        role: worker
+      containers:
+      - name: flask
+        image: flask-test
+        command: ["gunicorn", "-w", "4", "-k", "gevent", "--bind", "0.0.0.0:8000", "--timeout", "120", "--keep-alive", "400", "--log-level", "debug", "--access-logfile", "-", "app:app"]
+        ports:
+        - containerPort: 8000
+        env:
+        - name: WAIT_TIME
+          value: "20" # app.py의 wait_time을 20초로 설정
+        - name: TIMEOUT
+          value: "10" # Gunicorn의 timeout을 60초로 설정
+        - name: KEEP_ALIVE
+          value: "10" # Gunicorn의 keep-alive를 10초로 설정
